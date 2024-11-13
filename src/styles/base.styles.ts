@@ -14,15 +14,25 @@ export const baseStyles = StyleSheet.create({
     },
     header: {
         height: headerHeight,
+        backgroundColor: 'white',
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 10
     },
     scrollView: {
         height: height - (headerHeight + footerHeight) + 30,
+        backgroundColor: theme.background,
+
     },
     footer: {
         display: 'flex',
         gap: 10,
         height: footerHeight,
         backgroundColor: 'white',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        alignItems: 'center'
     },
     vertContainer: {
         paddingLeft: 20,
@@ -37,7 +47,7 @@ export const baseStyles = StyleSheet.create({
     wrapperFull: {
         height: "100%",
         width: '100%',
-        backgroundColor: theme.background,
+        backgroundColor: "white",
         display: "flex",
         justifyContent: 'center',
         paddingRight: 30,
@@ -45,4 +55,8 @@ export const baseStyles = StyleSheet.create({
         paddingTop: 30,
         paddingBottom: 30,
     },
+    fullScroll: {
+        width: "100%",
+        height: height - (headerHeight + footerHeight) + 30,
+    }
 });

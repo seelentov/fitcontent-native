@@ -3,7 +3,7 @@ export const fileApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getFile: builder.query<IResponse<IFile>, { id: number }>({
             query: ({ id }) => `/files/${id}`,
-            providesTags: ['file'],
+            providesTags: ['file', "auth"],
         }),
         createFile: builder.mutation<IResponse<IFile>, IFileStoreRequest>({
             query: (body) => ({

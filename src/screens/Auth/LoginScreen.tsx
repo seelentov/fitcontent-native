@@ -15,8 +15,8 @@ type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 export default function LoginScreen({ navigation }: LoginScreenProps) {
 
-    const [login, setLogin] = useState<string>('')
-    const [password, setPass] = useState<string>('')
+    const [login, setLogin] = useState<string>('admin2@mail.com')
+    const [password, setPass] = useState<string>('rootroot')
     const [loginMutation, { isLoading: isLoadingLogin }] = useLoginMutation()
 
     const defaultErrors = {
@@ -39,31 +39,46 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     useEffect(() => {
         if (isAuthenticated) {
             navigation.popToTop()
-            navigation.replace('Folder')
+            navigation.replace('Folder', { folder_id: null })
         }
     }, [isAuthenticated])
 
-    const tryLogin = async () => {
+    const fetch = async () => {
         setErrors(defaultErrors);
+
+        if (login == "" || password == "") {
+            setError("message", ["Введите логин и пароль"]);
+            return
+        }
+
         loginMutation({
             login,
             password
         })
             .then((response: any) => {
-                console.log(response)
                 if (response.error) {
                     const errors = response.error.data.errors as { [key: string]: string[] };
-                    Object.entries(errors).forEach((error) => {
-                        setError(error[0], error[1])
-                    })
-                } else if (response?.data?.token) {
-                    const token = response.data.token || "" as string
+
+                    if (errors) {
+                        Object.entries(errors).forEach((error) => {
+                            setError(error[0], error[1])
+                        })
+                    }
+
+                    const message = response?.error?.data?.message
+
+                    if (!errors && message) {
+                        setError("message", [message])
+                    }
+
+                } else if (response?.data?.access_token) {
+                    const token = response.data.access_token || "" as string
                     authorization(token)
                 } else {
                     Alert.alert("Error", JSON.stringify(response))
                 }
             })
-            .catch(console.log)
+            .catch((e) => Alert.alert("Error", JSON.stringify(e)))
     }
 
     return (
@@ -78,7 +93,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                             setValue={setLogin}
                             placeholder="Логин"
                         />
-                        {errors.Login && <Text style={{ color: 'red' }}>{errors.Login[0]}</Text>}
+                        {errors.login && <Text style={{ color: 'red' }}>{errors.login[0]}</Text>}
                         <Br />
                         <Input
                             value={password}
@@ -86,9 +101,9 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                             placeholder="Пароль"
                             secureTextEntry={true}
                         />
-                        {errors.Password && <Text style={{ color: 'red' }}>{errors.Password[0]}</Text>}
+                        {errors.password && <Text style={{ color: 'red' }}>{errors.password[0]}</Text>}
                         <Br />
-                        <Button onPress={() => tryLogin()}>Вход</Button>
+                        <Button onPress={() => fetch()}>Вход</Button>
                         {errors.message && <Text style={{ color: 'red' }}>{errors.message[0]}</Text>}
                         <Br />
                         <Pressable onPress={() => navigation.navigate('SignUp')}>

@@ -28,7 +28,7 @@ export default function SignUpScreen({ navigation }: LoginScreenProps) {
         phone: undefined,
         email: undefined,
         password: undefined,
-        authorization: undefined
+        message: undefined
     }
 
     const [errors, setErrors] = useState<{ [key: string]: string[] | undefined }>(defaultErrors);
@@ -42,15 +42,15 @@ export default function SignUpScreen({ navigation }: LoginScreenProps) {
     useEffect(() => {
         if (isAuthenticated) {
             navigation.popToTop()
-            navigation.replace('Folder')
+            navigation.replace('Folder', { folder_id: null })
         }
     }, [isAuthenticated])
 
-    const trySignUp = async () => {
+    const fetch = async () => {
         setErrors(defaultErrors);
 
         if (password !== passwordRepeat) {
-            setError("authorization", ["Пароль и подтверждение пароля отличаются"]);
+            setError("message", ["Пароль и подтверждение пароля отличаются"]);
             return
         }
 
@@ -63,17 +63,27 @@ export default function SignUpScreen({ navigation }: LoginScreenProps) {
             .then((response: any) => {
                 if (response.error) {
                     const errors = response.error.data.errors as { [key: string]: string[] };
-                    Object.entries(errors).forEach((error) => {
-                        setError(error[0], error[1])
-                    })
-                } else if (response?.data?.token) {
-                    const token = response.data.token || "" as string
+
+                    if (errors) {
+                        Object.entries(errors).forEach((error) => {
+                            setError(error[0], error[1])
+                        })
+                    }
+
+                    const message = response?.error?.data?.message
+
+                    if (!errors && message) {
+                        setError("message", [message])
+                    }
+
+                } else if (response?.data?.access_token) {
+                    const token = response.data.access_token || "" as string
                     authorization(token)
                 } else {
                     Alert.alert("Error", JSON.stringify(response))
                 }
             })
-            .catch(console.log)
+            .catch((e) => Alert.alert("Error", JSON.stringify(e)))
     }
 
     return (
@@ -87,7 +97,7 @@ export default function SignUpScreen({ navigation }: LoginScreenProps) {
                         setValue={setName}
                         placeholder="Логин"
                     />
-                    {errors.Name && <Text style={{ color: 'red' }}>{errors.Name[0]}</Text>}
+                    {errors.name && <Text style={{ color: 'red' }}>{errors.name[0]}</Text>}
                     <Br />
                     <Input
                         value={phone}
@@ -95,14 +105,14 @@ export default function SignUpScreen({ navigation }: LoginScreenProps) {
                         placeholder="Номер телефона"
                         inputMode={'numeric'}
                     />
-                    {errors.Phone && <Text style={{ color: 'red' }}>{errors.Phone[0]}</Text>}
+                    {errors.phone && <Text style={{ color: 'red' }}>{errors.phone[0]}</Text>}
                     <Br />
                     <Input
                         value={email}
                         setValue={setEmail}
                         placeholder="E-mail"
                     />
-                    {errors.Email && <Text style={{ color: 'red' }}>{errors.Email[0]}</Text>}
+                    {errors.email && <Text style={{ color: 'red' }}>{errors.email[0]}</Text>}
                     <Br />
                     <Input
                         value={password}
@@ -110,7 +120,7 @@ export default function SignUpScreen({ navigation }: LoginScreenProps) {
                         placeholder="Пароль"
                         secureTextEntry={true}
                     />
-                    {errors.Password && <Text style={{ color: 'red' }}>{errors.Password[0]}</Text>}
+                    {errors.password && <Text style={{ color: 'red' }}>{errors.password[0]}</Text>}
                     <Br />
                     <Input
                         value={passwordRepeat}
@@ -119,8 +129,8 @@ export default function SignUpScreen({ navigation }: LoginScreenProps) {
                         secureTextEntry={true}
                     />
                     <Br />
-                    <Button onPress={() => trySignUp()}>Регистрация</Button>
-                    {errors.authorization && <Text style={{ color: 'red' }}>{errors.authorization[0]}</Text>}
+                    <Button onPress={() => fetch()}>Регистрация</Button>
+                    {errors.message && <Text style={{ color: 'red' }}>{errors.message[0]}</Text>}
                     <Br />
                     <Pressable onPress={() => navigation.navigate('Login')}>
                         <Text>Есть аккаунт? Войти</Text>

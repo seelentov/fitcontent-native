@@ -2,7 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { NavigationProp, ParamListBase, useNavigation, CommonActions } from '@react-navigation/native';
 import { useActions } from '@hooks//useActions';
-import { useGetMeQuery } from '@store//api/auth.api';
+import { useGetMeQuery, useRefreshMutation } from '@store//api/auth.api';
+import { API_URL } from '@store//api/api';
 
 
 export const AuthContext = createContext<AuthContextProps>({
@@ -33,15 +34,13 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     const [isLoadingAuth, setIsLoadingAuth] = useState<boolean>(true);
     const { setToken } = useActions()
 
-    const [checkSubInterval, setCheckSubInterval] = useState<number>(5000)
-
     const navigation: NavigationProp<ParamListBase> = useNavigation()
 
-    // const { data: meData, error: meError } = useGetMeQuery(undefined, {
-    //     pollingInterval: 5000
-    // });
+    const { data: meData, error: meError } = useGetMeQuery(undefined, {
+        pollingInterval: 5000
+    });
 
-
+    const [refreshToken] = useRefreshMutation();
 
     const navigateTo = (screen: string) => {
         navigation.dispatch(
@@ -52,30 +51,49 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         );
     }
 
-
-
     useEffect(() => {
         setIsLoadingAuth(true)
-
         const checkAuth = async () => {
             const token = await AsyncStorage.getItem('token') || "";
-            if (token) {
-                setToken(token)
-                setIsAuthenticated(true);
+            if (token != "") {
+                console.log(token)
+                const res = await refreshToken({ token })
+
+                console.log(res)
+
+                if (res?.error) {
+                    navigateTo("Login")
+                    return
+                }
+
+                authorization(token)
                 navigateTo("Folder")
             }
-
-            // else {
-            //     navigateTo("Login")
-
-            // }
-
+            else {
+                navigateTo("Login")
+            }
         };
 
         checkAuth();
         setIsLoadingAuth(false)
     }, []);
 
+
+    // useEffect(() => {
+    //     const intervalId = setInterval(() => {
+    //         refreshToken().then(res => {
+    //             const token = res?.data?.access_token || "" as string
+    //             console.log(res)
+
+    //             if (token) {
+    //                 authorization(token)
+    //             }
+    //         })
+
+    //     }, 1000);
+
+    //     return () => clearInterval(intervalId);
+    // }, []);
 
     // useEffect(() => {
     //     const intervalId = setInterval(() => {
@@ -107,10 +125,13 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     //     return () => clearInterval(intervalId);
     // }, [meData, checkSubInterval]);
 
-
-    const authorization = async (token: string) => {
+    const setTokenHandle = async (token: string) => {
         await AsyncStorage.setItem('token', token);
         setToken(token)
+    }
+
+    const authorization = async (token: string) => {
+        await setTokenHandle(token)
         setIsAuthenticated(true);
 
     };

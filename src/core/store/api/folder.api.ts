@@ -1,13 +1,13 @@
 import { api } from './api'
 export const folderApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getFolder: builder.query<IResponse<IFolderPage>, { id?: number }>({
-            query: ({ id }) => `/folders/${id}`,
-            providesTags: ['folder'],
+        getFolder: builder.query<IResponse<IFolderPage>, { id: number | null }>({
+            query: ({ id }) => `/folders/${id ? id : ""}`,
+            providesTags: ['folder', "auth"],
         }),
         createFolder: builder.mutation<IResponse<IFolder>, IFolderStoreRequest>({
             query: (body) => ({
-                url: "/folders/",
+                url: "/folders",
                 method: "POST",
                 body,
             }),

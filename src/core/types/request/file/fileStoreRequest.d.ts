@@ -1,4 +1,4 @@
 interface IFileStoreRequest {
     file: File
-    folder_id?: number
+    folder_id: number | null
 }

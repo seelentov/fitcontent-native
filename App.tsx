@@ -17,12 +17,11 @@ export default function App() {
         backgroundColor: "#fff",
         paddingTop: Platform.OS !== 'android' ? StatusBarManager.HEIGHT : 0,
       }}>
-        <Text>asd</Text>
-        {/* <NavigationContainer>
+        <NavigationContainer>
           <AuthProvider>
             <Router />
           </AuthProvider>
-        </NavigationContainer> */}
+        </NavigationContainer>
       </SafeAreaView>
     </Provider>
   );

@@ -10,11 +10,9 @@ type IButtonProps = {
 
 export default function Button({ onPress, children, color }: IButtonProps) {
 
-
-
     return (
         <Pressable onPress={onPress}>
-            <View style={{...styles.main, backgroundColor: color || theme.color}}>
+            <View style={{ ...styles.main, backgroundColor: color || theme.color }}>
                 <Text style={styles.text}>
                     {children}
                 </Text>

@@ -3,5 +3,5 @@ type IFolderPage = IEntity & {
     folders: IFolder[]
     name?: string
     user_id?: number
-    parent_id?: number
+    parent_id: number | null
 }

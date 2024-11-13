@@ -31,11 +31,16 @@ export const authApi = api.injectEndpoints({
             invalidatesTags: ['auth'],
         }),
 
-        refresh: builder.mutation<IResponseWithToken, void>({
-            query: (body) => ({
-                url: "/auth/register",
+        refresh: builder.mutation<IResponseWithToken, { token?: string }>({
+            query: ({ token }) => ({
+                url: "/auth/refresh",
                 method: "POST",
-                body,
+                prepareHeaders: (headers: any) => {
+                    if (token) {
+                        headers.set('Authorization', "Bearer " + token);
+                    }
+                    return headers;
+                }
             }),
             invalidatesTags: ['auth'],
         })

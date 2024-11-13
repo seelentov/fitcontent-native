@@ -1,0 +1,2 @@
+type IResponse<T> = T;
+

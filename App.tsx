@@ -1,4 +1,4 @@
-import { Alert, NativeModules, PermissionsAndroid, Platform, SafeAreaView } from 'react-native';
+import { Alert, NativeModules, PermissionsAndroid, Platform, SafeAreaView, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import Router from './src/Router';
 import theme from './src/core/config/theme';
@@ -17,11 +17,12 @@ export default function App() {
         backgroundColor: "#fff",
         paddingTop: Platform.OS !== 'android' ? StatusBarManager.HEIGHT : 0,
       }}>
-        <NavigationContainer>
+        <Text>asd</Text>
+        {/* <NavigationContainer>
           <AuthProvider>
             <Router />
           </AuthProvider>
-        </NavigationContainer>
+        </NavigationContainer> */}
       </SafeAreaView>
     </Provider>
   );

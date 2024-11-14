@@ -31,7 +31,6 @@
     "react-native-svg": "15.2.0",
     "react-redux": "^9.1.2",
     "react-native-webview": "13.8.6",
-    "undefined": "expo-file-system/next",
     "expo-file-system": "~17.0.1"
   },
   "devDependencies": {
